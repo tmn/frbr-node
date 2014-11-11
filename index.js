@@ -4,7 +4,14 @@ var options = require('./config.json')
 
 var conn = new ExistConnection(options.dev)
 
-var get_resource = function (resource) {
+var std = {
+  PERSON: 'http://iflastandards.info/ns/fr/frbr/frbrer/C1005',
+  WORK: 'http://iflastandards.info/ns/fr/frbr/frbrer/C1001',
+  EXPRESSION: 'http://iflastandards.info/ns/fr/frbr/frbrer/C1002',
+  MANIFESTATION: 'http://iflastandards.info/ns/fr/frbr/frbrer/C1003'
+}
+
+/* var get_resource = function (resource) {
   conn.get('/db/frbrsearch/data/frbrxml/' + resource + '.xml', function (res) {
     var data = []
 
@@ -20,17 +27,29 @@ var get_resource = function (resource) {
       console.log(err);
     })
   })
+} */
+
+var xq_query = fs.readFileSync("query.xql", "UTF-8")
+var query = conn.query(xq_query, { chunkSize: 1000 })
+
+var tQuery = function () {
+
+  var search_type = process.argv[2].toUpperCase()
+  var search_query = process.argv.slice(3).join(' ')
+
+  query.bind('query', search_query)
+  query.bind('type', std[search_type])
+
+  query.each(function (rows) {
+    if (rows.length > 1) {
+      rows.forEach(function(row) {
+        console.log('%s\t%s', row.id, row.score);
+      });
+    }
+    else {
+      console.log('   %s\t\t%s', rows.id, rows.score);
+    }
+  })
 }
 
-var search_query = process.argv.slice(2).join(' ')
-var xq_query = fs.readFileSync("query.xql", "UTF-8")
-
-var query = conn.query(xq_query)
-query.bind('query', search_query)
-
-console.log('Query:', search_query);
-console.log('--------------------------------------------');
-
-query.each(function (item, hits, offset) {
-  console.log('- ', item, hits, offset);
-})
+tQuery()

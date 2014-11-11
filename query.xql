@@ -1,18 +1,19 @@
 xquery version "3.0";
 
-declare namespace x = "http://www.w3.org/1999/xhtml";
 declare namespace f = "http://idi.ntnu.no/frbrizer/";
 declare namespace marc = "http://www.loc.gov/MARC21/slim";
-
-(: import module namespace request="http://exist-db.org/xquery/request";
-import module namespace session="http://exist-db.org/xquery/session";
-import module namespace util="http://exist-db.org/xquery/util";
-import module namespace transform="http://exist-db.org/xquery/transform"; :)
+declare namespace json = "http://www.json.org";
 
 declare variable $query external;
+declare variable $type external;
 
-declare option exist:serialize "method=xml media-type=application/xml";
+declare option exist:serialize "method=json media-type=application/json";
 
-let $persons := distinct-values(collection('/db/frbrsearch/data/frbrxml')/marc:record[ft:query(., $query) and @f:type = "http://iflastandards.info/ns/fr/frbr/frbrer/C1001"]/@f:id)
+let $persons := collection('/db/frbrsearch/data/frbrxml')/marc:record[ft:query(., $query) and @f:type = $type]
 
-return $persons
+for $person in $persons order by ft:score($person) descending
+return
+  <json:value json:array="true">
+    <id>{data($person/@f:id)}</id>
+    <score>{ft:score($person)}</score>
+  </json:value>
