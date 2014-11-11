@@ -1,31 +1,36 @@
 var ExistConnection = require('./existdb-node')
+var fs = require('fs')
 var options = require('./config.json')
-
 
 var conn = new ExistConnection(options.dev)
 
+var get_resource = function (resource) {
+  conn.get('/db/frbrsearch/data/frbrxml/' + resource + '.xml', function (res) {
+    var data = []
 
-conn.get('/db/frbrsearch/data/frbrxml', function (res) {
-  var data = []
+    res.on('data', function (chunk) {
+      data.push(chunk)
+    })
 
-  res.on('data', function (chunk) {
-    data.push(chunk)
+    res.on('end', function () {
+      // console.log(data.join(''));
+    })
+
+    res.on('error', function (err) {
+      console.log(err);
+    })
   })
+}
 
-  res.on('end', function () {
-    console.log(data.join(''));
-  })
+var search_query = process.argv.slice(2).join(' ')
+var xq_query = fs.readFileSync("query.xql", "UTF-8")
 
-  res.on('error', function (err) {
-    console.log(err);
-  })
-})
+var query = conn.query(xq_query)
+query.bind('query', search_query)
 
-var query = conn.query('distinct-values(collection(\'/db/frbrsearch/data/frbrxml\')/marc:record[ft:query(., $query) and @f:type = "http://iflastandards.info/ns/fr/frbr/frbrer/C1005"]/@f:id)')
+console.log('Query:', search_query);
+console.log('--------------------------------------------');
 
 query.each(function (item, hits, offset) {
-  console.log(item);
-  console.log(hits);
-  console.log(offset);
-  console.log('-------------------------');
+  console.log('- ', item, hits, offset);
 })
