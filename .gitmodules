@@ -1,0 +1,3 @@
+[submodule "existdb-node"]
+	path = existdb-node
+	url = https://github.com/tmn/existdb-node.git

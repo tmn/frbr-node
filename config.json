@@ -1,0 +1,9 @@
+{
+  "dev": {
+    "host": "localhost",
+    "port": 80,
+    "rest": "",
+    "user": "",
+    "pass": ""
+  }
+}
