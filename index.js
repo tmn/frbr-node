@@ -41,15 +41,23 @@ var tQuery = function () {
   query.bind('type', std[search_type])
 
   query.each(function (rows) {
-    if (rows.length > 1) {
+    if (rows === null) {
+      return console.error('   Something went wrong')
+    }
+
+    if (Array.isArray(rows)) {
       rows.forEach(function(row) {
-        console.log('%s\t%s', row.id, row.score);
+        console.log('   %s\t\t%s', row.id, row.score)
       });
     }
     else {
-      console.log('   %s\t\t%s', rows.id, rows.score);
+      console.log('   %s\t\t%s', rows.id, rows.score)
     }
   })
 }
+
+query.on('error', function (err) {
+  console.log('Something went wrong: ' + err)
+})
 
 tQuery()

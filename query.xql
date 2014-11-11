@@ -9,11 +9,11 @@ declare variable $type external;
 
 declare option exist:serialize "method=json media-type=application/json";
 
-let $persons := collection('/db/frbrsearch/data/frbrxml')/marc:record[ft:query(., $query) and @f:type = $type]
+let $dataset := collection('/db/frbrsearch/data/frbrxml')/marc:record[ft:query(., $query) and @f:type = $type]
 
-for $person in $persons order by ft:score($person) descending
+for $node in $dataset order by ft:score($node) descending
 return
   <json:value json:array="true">
-    <id>{data($person/@f:id)}</id>
-    <score>{ft:score($person)}</score>
+    <id>{data($node/@f:id)}</id>
+    <score>{ft:score($node)}</score>
   </json:value>
