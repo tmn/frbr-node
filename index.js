@@ -1,36 +1,25 @@
-var ExistConnection = require('./existdb-node')
 var fs = require('fs')
-var options = require('./config.json')
+
+var ExistConnection = require('./existdb-node')
+, options = require('./config.json')
+
+var Node = require('./Node')
+, Type = require('./Type')
 
 var conn = new ExistConnection(options.dev)
 
-var std = {
-  PERSON: 'http://iflastandards.info/ns/fr/frbr/frbrer/C1005',
-  WORK: 'http://iflastandards.info/ns/fr/frbr/frbrer/C1001',
-  EXPRESSION: 'http://iflastandards.info/ns/fr/frbr/frbrer/C1002',
-  MANIFESTATION: 'http://iflastandards.info/ns/fr/frbr/frbrer/C1003'
-}
-
-/* var get_resource = function (resource) {
-  conn.get('/db/frbrsearch/data/frbrxml/' + resource + '.xml', function (res) {
-    var data = []
-
-    res.on('data', function (chunk) {
-      data.push(chunk)
-    })
-
-    res.on('end', function () {
-      // console.log(data.join(''));
-    })
-
-    res.on('error', function (err) {
-      console.log(err);
-    })
-  })
-} */
+var nodes = {}
+var persons = {}
+, works = {}
+, expressions = {}
+, manifestations = {}
 
 var xq_query = fs.readFileSync("query.xql", "UTF-8")
 var query = conn.query(xq_query, { chunkSize: 1000 })
+
+var get_relations = function () {
+
+}
 
 var tQuery = function () {
 
@@ -38,7 +27,7 @@ var tQuery = function () {
   var search_query = process.argv.slice(3).join(' ')
 
   query.bind('query', search_query)
-  query.bind('type', std[search_type])
+  query.bind('type', Type[search_type])
 
   query.each(function (rows) {
     if (rows === null) {
@@ -47,11 +36,11 @@ var tQuery = function () {
 
     if (Array.isArray(rows)) {
       rows.forEach(function(row) {
-        console.log('   %s\t\t%s', row.id, row.score)
+        nodes[row.id] = new Node(row.id, row.type, row.score, row.content.record)
       });
     }
     else {
-      console.log('   %s\t\t%s', rows.id, rows.score)
+      console.log('   %s\t\t%s', rows.id, rows.type, rows.score, rows.content)
     }
   })
 }
