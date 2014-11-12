@@ -22,7 +22,6 @@ var get_relations = function () {
 }
 
 var tQuery = function () {
-
   var search_type = process.argv[2].toUpperCase()
   var search_query = process.argv.slice(3).join(' ')
 
@@ -47,6 +46,10 @@ var tQuery = function () {
 
 query.on('error', function (err) {
   console.log('Something went wrong: ' + err)
+})
+
+query.on('end', function (data) {
+  console.log('END: ' + data)
 })
 
 tQuery()
