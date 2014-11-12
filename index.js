@@ -14,16 +14,35 @@ var persons = {}
 , expressions = {}
 , manifestations = {}
 
-var xq_query = fs.readFileSync("query.xql", "UTF-8")
+
+var build_search_structure = function (query, list) {
+  query.each(function (rows) {
+    if (rows === null) {
+      return console.error('--- no data found')
+    }
+
+    if (Array.isArray(rows)) {
+      rows.forEach(function(row) {
+        list[row.id] = new Node(row.id, row.type, row.score, row.content.record)
+      });
+    }
+    else {
+      console.log('   %s\t\t%s', rows.id, rows.type, rows.score)
+    }
+  })
+}
 
 
-var search_type   = process.argv[2].toUpperCase()
-var search_query  = process.argv.slice(2).join(' ')
+var xq_query      = fs.readFileSync("query.xql", "UTF-8")
+, search_type   = process.argv[2].toUpperCase()
+, search_query  = process.argv.slice(2).join(' ')
 
-if (Type[search_type] === undefined)
+if (Type[search_type] === undefined) {
   search_type = 'PERSON'
-else
+}
+else {
   search_query = process.argv.slice(3).join(' ')
+}
 
 
 var query_person      = conn.query(xq_query, { chunkSize: 1000 })
@@ -42,24 +61,6 @@ query_expression.bind('query', search_query)
 
 query_manifestation.bind('type', Type.MANIFESTATION)
 query_manifestation.bind('query', search_query)
-
-
-var build_search_structure = function (query, list) {
-  query.each(function (rows) {
-    if (rows === null) {
-      return console.error('--- no data found')
-    }
-
-    if (Array.isArray(rows)) {
-      rows.forEach(function(row) {
-        list[row.id] = new Node(row.id, row.type, row.score, row.content.record)
-      });
-    }
-    else {
-      console.log('   %s\t\t%s', rows.id, rows.type, rows.score)
-    }
-  })
-}
 
 query_person.on('end', function (data) {
   console.log('person end', this.variables);
