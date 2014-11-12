@@ -27,7 +27,7 @@ var build_search_structure = function (query, list) {
       })
     }
     else {
-      console.log('   %s\t\t%s', rows.id, rows.type, rows.score)
+      list[rows.id] = new Node(rows.id, rows.type, rows.score, rows.content.record)
     }
   })
 }
