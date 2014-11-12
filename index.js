@@ -24,7 +24,7 @@ var build_search_structure = function (query, list) {
     if (Array.isArray(rows)) {
       rows.forEach(function(row) {
         list[row.id] = new Node(row.id, row.type, row.score, row.content.record)
-      });
+      })
     }
     else {
       console.log('   %s\t\t%s', rows.id, rows.type, rows.score)
@@ -33,7 +33,7 @@ var build_search_structure = function (query, list) {
 }
 
 
-var xq_query      = fs.readFileSync("query.xql", "UTF-8")
+var xq_query    = fs.readFileSync("query.xql", "UTF-8")
 , search_type   = process.argv[2].toUpperCase()
 , search_query  = process.argv.slice(2).join(' ')
 
@@ -45,44 +45,54 @@ else {
 }
 
 
-var query_person      = conn.query(xq_query, { chunkSize: 1000 })
-, query_work          = conn.query(xq_query, { chunkSize: 1000 })
-, query_expression    = conn.query(xq_query, { chunkSize: 1000 })
-, query_manifestation = conn.query(xq_query, { chunkSize: 1000 })
+var queries = {
+  person:         conn.query(xq_query, { chunkSize: 1000 }),
+  work:           conn.query(xq_query, { chunkSize: 1000 }),
+  expression:     conn.query(xq_query, { chunkSize: 1000 }),
+  manifestation:  conn.query(xq_query, { chunkSize: 1000 })
+}
 
-query_person.bind('type', Type.PERSON)
-query_person.bind('query', search_query)
 
-query_work.bind('type', Type.WORK)
-query_work.bind('query', search_query)
+queries.person.bind('type', Type.PERSON)
+queries.person.bind('query', search_query)
 
-query_expression.bind('type', Type.EXPRESSION)
-query_expression.bind('query', search_query)
+queries.work.bind('type', Type.WORK)
+queries.work.bind('query', search_query)
 
-query_manifestation.bind('type', Type.MANIFESTATION)
-query_manifestation.bind('query', search_query)
+queries.expression.bind('type', Type.EXPRESSION)
+queries.expression.bind('query', search_query)
 
-query_person.on('end', function (data) {
-  console.log('person end', this.variables);
-  console.log();
+queries.manifestation.bind('type', Type.MANIFESTATION)
+queries.manifestation.bind('query', search_query)
+
+queries.person.on('end', function (data) {
+  console.log('person end', this.variables)
+  console.log()
 })
-query_work.on('end', function (data) {
-  console.log('work end', this.variables);
-  console.log();
+queries.work.on('end', function (data) {
+  console.log('work end', this.variables)
+  console.log()
 })
-query_expression.on('end', function (data) {
-  console.log('expression end', this.variables);
-  console.log();
+queries.expression.on('end', function (data) {
+  console.log('expression end', this.variables)
+  console.log()
 })
-query_manifestation.on('end', function (data) {
-  console.log('manifestation end', this.variables);
-  console.log();
+queries.manifestation.on('end', function (data) {
+  console.log('manifestation end', this.variables)
+  console.log()
 })
 
-build_search_structure(query_person, persons)
-build_search_structure(query_work, works)
-build_search_structure(query_expression, expressions)
-build_search_structure(query_manifestation, manifestations)
+build_search_structure(queries.person, persons)
+build_search_structure(queries.work, works)
+build_search_structure(queries.expression, expressions)
+build_search_structure(queries.manifestation, manifestations)
+
+
+
+
+
+
+
 
 
 /* TEST QUERY
@@ -100,7 +110,7 @@ var test_query = function () {
     if (Array.isArray(rows)) {
       rows.forEach(function(row) {
         nodes[row.id] = new Node(row.id, row.type, row.score, row.content.record)
-      });
+      })
     }
     else {
       console.log('   %s\t\t%s', rows.id, rows.type, rows.score)
@@ -112,9 +122,9 @@ query.on('error', function (err) {
   console.log('Something went wrong: ' + err)
 })
 
-query.on('end', function (data, type) {
-  // console.log('END: ' + data)
-  console.log(this.variables);
+query.on('end', function (data) {
+  console.log(this.variables)
+  console.log()
 })
 
 test_query()
