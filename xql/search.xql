@@ -15,7 +15,7 @@ let $sorted_nodes :=
   order by ft:score($node) descending
   return $node
 
-for $node at $count in subsequence($sorted_nodes, 1, 2)
+for $node at $count in subsequence($sorted_nodes, 1, 5)
 return
   <json:value json:array="true">
     <id>{data($node/@f:id)}</id>
