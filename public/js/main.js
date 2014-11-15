@@ -1,3 +1,4 @@
+var domify = require('domify')
 var io = require('socket.io-client')('http://localhost');
 io.on('connect', function(){
   console.log('asdfasdfsdf connect');
