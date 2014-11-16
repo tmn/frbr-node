@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "browserify": "public/js/main.js -o public/js/bundle.js",
+    "browserify": "lib/main.js -o public/js/bundle.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "uglifyjs": "uglifyjs 1.js 2.js -o app.js",
-    "watch": "watchify public/js/main.js -o public/js/bundle.js -d"
+    "watch": "watchify lib/main.js -o public/js/bundle.js -d"
   },
   "author": "",
   "license": "ISC",
