@@ -18,7 +18,7 @@ let $sorted_nodes :=
 for $node at $count in subsequence($sorted_nodes, 1, 5)
 return
   <json:value json:array="true">
-    <id>{data($node/@f:id)}</id>
+    <id>{data($node/@id)}</id>
     <score>{ft:score($node)}</score>
     <doc>{$node}</doc>
   </json:value>

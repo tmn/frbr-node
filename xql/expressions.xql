@@ -6,7 +6,7 @@ declare namespace json = "http://www.json.org";
 
 declare option exist:serialize "method=json media-type=application/json";
 
-let $dataset := collection('/db/frbrsearch/data/frbrxml')/marc:record[@f:type = 'http://iflastandards.info/ns/fr/frbr/frbrer/C1002']
+let $dataset := collection('/db/frbrsearch/data/frbrxml')/marc:record[@f:type = 'C1002']
 
 for $node in $dataset
 return
